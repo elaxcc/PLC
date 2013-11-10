@@ -3,6 +3,8 @@
 #include "YDebug.h"
 #include "YDelay.h"
 
+#include "Plc.h"
+
 #ifdef YDEBUG
 void DebugUartInit(void)
 {
@@ -47,6 +49,10 @@ int main(void)
 	// Debug library initialization
 	YDebugInit(&DebugUartTransmit, &DebugUartIsTransmissionComplete);
 	#endif // YDEBUG
+	
+	PlcInit();
+	
+	__enable_irq();
 	
 	while(YTRUE)
 	{

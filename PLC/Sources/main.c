@@ -50,14 +50,15 @@ int main(void)
 	YDebugInit(&DebugUartTransmit, &DebugUartIsTransmissionComplete);
 	#endif // YDEBUG
 	
-	PlcInit();
-	
 	__enable_irq();
+	
+	PlcInit();
 	
 	while(YTRUE)
 	{
-		YDebugSendMessage("Infinit loop\r\n", 14);
-		YDelay(1000);
+		PlcSendByte(0x13);
+		//YDebugSendMessage("Infinit loop\r\n", 14);
+		//YDelay(1000);
 	}
 	
 	return 0;

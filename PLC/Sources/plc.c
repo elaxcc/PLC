@@ -64,7 +64,7 @@
 #define PLC_DATA3_EN_TIM TIM6->CR1 |= 0x0001
 #define PLC_DATA3_DIS_TIM TIM6->CR1 &= 0xFFFE
 
-#define PLC_PERIODS_CNT 16
+#define PLC_PERIODS_CNT 5
 
 #define PLC_PINS_GROUP_0 0
 #define PLC_PINS_GROUP_1 1
@@ -80,6 +80,7 @@ uint32_t plc_zero_period_num = 0;
 uint8_t plc_half_byte_num = 0;
 uint8_t plc_sending_byte;
 uint8_t plc_pins_group;
+YBOOL lpc_sin_periods_generate;
 volatile YBOOL plc_transmission_complete = YFALSE;
 
 void TIM2_IRQHandler(void)
@@ -111,6 +112,7 @@ void TIM2_IRQHandler(void)
 			{
 				PLC_DATA3_EN_TIM;
 			}
+			lpc_sin_periods_generate = YTRUE;
 		}
 		
 		// clk
@@ -136,14 +138,13 @@ void TIM2_IRQHandler(void)
 			CH1_CLK_LOW;
 		}
 		ch0_clk_set = YFALSE;
-		
 		plc_sin_period_num++;
-		
 		return;
 	}
-	else
+	else if (lpc_sin_periods_generate)
 	{
 		plc_zero_period_num = 0;
+		lpc_sin_periods_generate = YFALSE;
 		
 		// Disable TIMs
 		PLC_DATA0_DIS_TIM;
@@ -160,7 +161,7 @@ void TIM2_IRQHandler(void)
 	}
 	
 	// generate zero periods
-	if (plc_zero_period_num < PLC_PERIODS_CNT)
+	if (plc_zero_period_num < PLC_PERIODS_CNT * 2)
 	{
 		plc_zero_period_num++;
 		return;
@@ -168,6 +169,8 @@ void TIM2_IRQHandler(void)
 	else
 	{
 		plc_half_byte_num += 4;
+		plc_sin_period_num = 0;
+		plc_zero_period_num = 0;
 	}
 	
 	if (plc_half_byte_num > 4)
@@ -393,6 +396,9 @@ void PlcSendByte(uint8_t byte)
 	plc_half_byte_num = 0;
 	plc_sending_byte = byte;
 	plc_transmission_complete = YFALSE;
+	
+	PLC_CLK_EN_TIM;
+	TIM2->SR &= ~TIM_SR_UIF;
 	
 	while (plc_transmission_complete != YTRUE)
 	{

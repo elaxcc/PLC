@@ -53,6 +53,7 @@ int main(void)
 	__enable_irq();
 	
 	PlcInit();
+	PlcSetChannel(PLC_CHANNEL1);
 	
 	while(YTRUE)
 	{

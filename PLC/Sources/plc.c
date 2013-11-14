@@ -37,16 +37,36 @@
 #define CH1_DATA3_LOW GPIOB->BSRR |= GPIO_BSRR_BR9
 
 // frequence prescalers for TIMs
-#define TIM_ARR_60 0x0258 // 60.000,000 Hz
-#define TIM_ARR_64 0x0233 // 63.943,161 Hz
-#define TIM_ARR_68 0x0211 // 68.052,930 Hz
-#define TIM_ARR_72 0x01F4 // 72.000,000 Hz
-#define TIM_ARR_76 0x01DA // 75.949,367 Hz
-#define TIM_ARR_80 0x01C2 // 80.000,000 Hz
-#define TIM_ARR_84 0x01AD // 83.916,083 Hz
-#define TIM_ARR_88 0x0199 // 88.019,559 Hz
-#define TIM_ARR_92 0x0187 // 92.071,611 Hz
-#define TIM_ARR_96 0x0177 // 96.000,000 Hz
+#define TIM_ARR_60  0x0258 // 60.000,000 Hz - chanel 0
+#define TIM_ARR_64  0x0233 // 63.943,161 Hz
+#define TIM_ARR_68  0x0211 // 68.052,930 Hz
+#define TIM_ARR_72  0x01F4 // 72.000,000 Hz
+#define TIM_ARR_76  0x01DA // 75.949,367 Hz
+#define TIM_ARR_80  0x01C2 // 80.000,000 Hz - channel1
+#define TIM_ARR_84  0x01AD // 83.916,083 Hz
+#define TIM_ARR_88  0x0199 // 88.019,559 Hz
+#define TIM_ARR_92  0x0187 // 92.071,611 Hz
+#define TIM_ARR_96  0x0177 // 96.000,000 Hz
+#define TIM_ARR_200 0x00B4 // 200.000,000 Hz - channel 2
+#define TIM_ARR_204 0x00B1 // 203.389,830 Hz
+#define TIM_ARR_208 0x00AD // 208.092,485 Hz
+#define TIM_ARR_212 0x00AA // 211.764,705 Hz
+#define TIM_ARR_216 0x00A7 // 215.568,862 Hz
+#define TIM_ARR_220 0x00A4 // 219.512,195 Hz - channel 3
+#define TIM_ARR_224 0x00A1 // 223.602,484 Hz
+#define TIM_ARR_228 0x009E // 227.848,101 Hz
+#define TIM_ARR_232 0x009B // 232.258,064 Hz
+#define TIM_ARR_236 0x0099 // 235.294,117 Hz
+#define TIM_ARR_240 0x0096 // 240.000,000 Hz - channel 4
+#define TIM_ARR_244 0x0094 // 243.243,243 Hz
+#define TIM_ARR_248 0x0091 // 248.275,862 Hz
+#define TIM_ARR_252 0x008F // 251.748,251 Hz
+#define TIM_ARR_256 0x008D // 255.319,148 Hz
+#define TIM_ARR_260 0x008B // 258.992,805 Hz - channel 5
+#define TIM_ARR_264 0x0088 // 264.705,882 Hz
+#define TIM_ARR_268 0x0086 // 268.656,716 Hz
+#define TIM_ARR_272 0x0084 // 272.727,272 Hz
+#define TIM_ARR_276 0x0082 // 276.923,076 Hz
 
 // enable/disable clk
 #define PLC_CLK_EN_TIM TIM2->CR1 |= 0x0001
@@ -64,7 +84,7 @@
 #define PLC_DATA3_EN_TIM TIM6->CR1 |= 0x0001
 #define PLC_DATA3_DIS_TIM TIM6->CR1 &= 0xFFFE
 
-#define PLC_PERIODS_CNT 5
+#define PLC_PERIODS_CNT 16
 
 #define PLC_PINS_GROUP_0 0
 #define PLC_PINS_GROUP_1 1
@@ -308,6 +328,42 @@ void SetChannel1ToTIM(void)
 	TIM6->ARR = TIM_ARR_96;
 }
 
+void SetChannel2ToTIM(void)
+{
+	TIM2->ARR = TIM_ARR_200;
+	TIM3->ARR = TIM_ARR_204;
+	TIM4->ARR = TIM_ARR_208;
+	TIM5->ARR = TIM_ARR_212;
+	TIM6->ARR = TIM_ARR_216;
+}
+
+void SetChannel3ToTIM(void)
+{
+	TIM2->ARR = TIM_ARR_220;
+	TIM3->ARR = TIM_ARR_224;
+	TIM4->ARR = TIM_ARR_228;
+	TIM5->ARR = TIM_ARR_232;
+	TIM6->ARR = TIM_ARR_236;
+}
+
+void SetChannel4ToTIM(void)
+{
+	TIM2->ARR = TIM_ARR_240;
+	TIM3->ARR = TIM_ARR_244;
+	TIM4->ARR = TIM_ARR_248;
+	TIM5->ARR = TIM_ARR_252;
+	TIM6->ARR = TIM_ARR_256;
+}
+
+void SetChannel5ToTIM(void)
+{
+	TIM2->ARR = TIM_ARR_260;
+	TIM3->ARR = TIM_ARR_264;
+	TIM4->ARR = TIM_ARR_268;
+	TIM5->ARR = TIM_ARR_272;
+	TIM6->ARR = TIM_ARR_276;
+}
+
 void PlcInit(void)
 {
 	// enable GPIOx
@@ -384,8 +440,34 @@ void PlcSetChannel(uint32_t channel)
 			plc_pins_group = PLC_PINS_GROUP_0;
 			break;
 		}
+		case 0x00000002 :
+		{
+			SetChannel2ToTIM();
+			plc_pins_group = PLC_PINS_GROUP_1;
+			break;
+		}
+		case 0x00000003 :
+		{
+			SetChannel3ToTIM();
+			plc_pins_group = PLC_PINS_GROUP_1;
+			break;
+		}
+		case 0x00000004 :
+		{
+			SetChannel4ToTIM();
+			plc_pins_group = PLC_PINS_GROUP_1;
+			break;
+		}
+		case 0x00000005 :
+		{
+			SetChannel5ToTIM();
+			plc_pins_group = PLC_PINS_GROUP_1;
+			break;
+		}
 		default :
 		{
+			SetChannel0ToTIM();
+			plc_pins_group = PLC_PINS_GROUP_0;
 		}
 	}
 }
